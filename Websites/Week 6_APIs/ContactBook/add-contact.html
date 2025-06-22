@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Contact</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    </br>
+    <form id="editForm">
+        <div class="formGroup">
+        <label for="firstname">First Name</label>
+        <input type="text" name="firstname" class="inputBox" id="firstname"><br/>
+        </div>
+        <div class="formGroup">
+        <label for="lastname">Last name</label>
+        <input type="text" name="lastname" class="inputBox" id="lastname"><br/>
+        </div>
+        <div class="formGroup">
+        <label for="mobile">Mobile</label>
+        <input type="text" name="mobile" class="inputBox" id="mobile"><br/>
+        </div>
+        <div class="formGroup">
+        <label for="email">Email</label>
+        <input type="email" name="email" class="inputBox" id="email"><br/>
+        </div>
+        <div class="formGroup">
+        <label for="avatar">Select a file</label><br/>
+        <input type="file" name="avatar" id="avatar"><br/>
+        </div>
+        <div class="formGroup"></div>
+        <button type="submit" id="submitForm">Submit</button>
+    </div>
+        
+    </form>
+    <br/>
+    <button class="bottomButtons"id="homeLink" type="button">Home</button>
+    
+    <script src="config.js"></script>
+    <script>
+
+        document.getElementById("submitForm").addEventListener('click', submitForm);
+        document.getElementById("homeLink").addEventListener('click', homeLink);
+
+        function submitForm(e){ //Prevents reloading the page when "submit" is pressed
+            e.preventDefault();
+
+            const form = new FormData(document.querySelector('#editForm'));
+            form.append('apiKey', apiKey); // Append the API key to the form data
+
+            fetch(rootPath + 'controller/insert-contact/', {
+                method: 'POST',
+                headers: {Accept: 'application/json, *.*'}, 
+                body: form
+            }) 
+            .then(function(response) {
+                return response.text();
+            })
+            .then(function(data){
+                if(data == '1'){
+                    alert('Contact added.');
+                    homeLink();//link to home page
+                }
+                else{
+                    alert(data)
+                    homeLink(); //link to home page
+                }
+            })
+        }
+        function homeLink(){
+            window.open("index.html", "_self");
+        }
+
+    </script>
+    
+</body>
+</html>

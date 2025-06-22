@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="getContact()">
+    
+    <div id="avatarImage"></div>
+        <form id="editForm">
+            <div class="formGroup">
+            <label for="firstname">First name</label>
+            <input type="text" name="firstname" class="inputBox" id="firstname" readonly><br/>
+            </div>
+            <div class="formGroup">
+            <label for="lastname">Last name</label>
+            <input type="text" name="lastname" class="inputBox"id="lastname" readonly><br/>
+            </div>
+            <div class="formGroup">
+            <label for="mobile">Mobile</label>
+            <input type="text" name="mobile" class="inputBox"id="mobile"><br/>
+            </div>
+            <div class="formGroup">
+            <label for="email">Email</label>
+            <input type="text" name="email" class="inputBox"id="email" readonly><br/>
+            </div>
+            <br/>
+            <div class="formGroup">
+            <label for="avatar" id="avatarLabel"  hidden>Change profile image</label><br/>
+            <input type="file" name="avatar" id="avatar" hidden><br/>
+            </div>
+            <br/>
+            <div class="formGroup">
+            <button type="submit" id="submitForm" hidden>Submit</button>
+            </div>
+        </form>
+        <br/><br/>
+        <button class="bottomButtons"id="homeLink" type="button">Home</button>
+        <button class="bottomButtons"id="editContact" type="button">Edit</button>
+        <button class="bottomButtons"id="deleteContact" type="button">Delete</button>
+
+        <script src="config.js"></script>
+        <script>
+
+            var id = getId(); // Get the ID from the URL
+            
+
+            document.getElementById("homeLink").addEventListener('click', homeLink);
+            document.getElementById("editContact").addEventListener('click', editContact);
+            document.getElementById("submitForm").addEventListener('click', submitForm);
+            document.getElementById("deleteContact").addEventListener('click', deleteContact);
+
+            function getId(){
+                var url = window.location.href // Get the full current URL
+                var pos = url.search("=")
+                var id = url.slice(pos + 1) // Get the ID from the URL (cut-out everything before the "=" )
+                return id;
+            }
+
+            function getContact(){
+                fetch(rootPath + "controller/get-contacts/?id=" + id)
+                .then(function(response){
+                    return response.json();
+                })
+                .then(function(data){
+                    //display contact information
+                    displayOutput(data);
+
+                    
+                })
+            }   
+            
+            function displayOutput(data){
+                avatarImg = `
+                <img src="${rootPath}controller/uploads/${data[0].avatar}" width="200"/>
+                
+                `
+                document.getElementById("avatarImage").innerHTML=avatarImg;
+                document.getElementById("firstname").value = data[0].firstname;
+                document.getElementById("lastname").value = data[0].lastname;
+                document.getElementById("mobile").value = data[0].mobile;
+                document.getElementById("email").value = data[0].email;
+            }
+
+            function editContact(){
+                document.getElementById("firstname").removeAttribute("readonly");//similar to document.getElementById("firstname").readOnly = false;
+                document.getElementById("lastname").readOnly = false;
+                document.getElementById("mobile").readOnly = false;
+                document.getElementById("email").readOnly = false;
+                document.getElementById("avatar").hidden = false;
+                document.getElementById("avatarLabel").hidden = false;
+                document.getElementById("submitForm").hidden = false;
+            }
+
+           function submitForm(e){ //Prevents reloading the page when "submit" is pressed
+            e.preventDefault();
+
+            const form = new FormData(document.querySelector('#editForm'));
+            form.append('apiKey', apiKey); // Append the API key to the form data
+            form.append('id', id); // Append the ID to the form data (different from add-contact.html)
+
+            fetch(rootPath + 'controller/edit-contact/', {
+                method: 'POST',
+                headers: {Accept: 'application/json, *.*'}, 
+                body: form
+            }) 
+            .then(function(response) {
+                return response.text();
+            })
+            .then(function(data){
+                if(data == '1'){
+                    alert('Contact edited.');
+                    homeLink();//link to home page
+                }
+                else{
+                    alert(data)
+                    homeLink(); //link to home page
+                }
+            })
+           }
+
+            function deleteContact(){
+                var confirmDelete = confirm("Delete contact. Are you sure?");
+
+                if(confirmDelete == true){  
+                    fetch(rootPath + 'controller/delete-contact/?id=' + id)
+                    .then(function(response) {
+                        return response.text();
+                    })
+                    .then(function(data){
+                        if(data == '1'){
+                            alert('Contact deleted.');
+                            homeLink(); //link to home page
+                        }
+                        else{
+                            alert(data);
+                        }
+                    });
+                }
+            }
+
+            function homeLink(){
+                window.open("index.html", "_self");
+            }
+        </script>
+        
+            
+</body>
+</html>
