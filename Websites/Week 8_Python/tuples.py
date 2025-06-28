@@ -1,5 +1,6 @@
 #Similar to lists, Tuples are a collection of ordered elements
 #Unlike lists,Tuples are immutable once they are created
+#Common uses coordinates: RGB codes, Database records, etc
 
 my_tuples = (1,2,3,4,5) #round brackets instead of square brackets
 
